@@ -3,15 +3,21 @@ package com.papiocloud.sharedlibs.tests
 import org.codehaus.groovy.control.CompilerConfiguration
 import spock.lang.Specification
 
-class AbstractVarSpecification<T extends MockJenkinsGlobals> extends Specification {
+/**
+ * Abstract var specification, extend with a custom implementation of MockJenkinsGlobals to
+ * provide functionality not built into MockJenkinsGlobals
+ *
+ * It is recommended to create your own AbstractVarSpecification all other specifications extend
+ * if using a custom implementation of MockJenkinsGlobals.
+ *
+ * @param <T>
+ */
+abstract class AbstractVarSpecification<T extends MockJenkinsGlobals> extends Specification {
 
-    final T globals
-    final Binding vars
+    final T globals = Spy(this.globalsType)
+    final Binding vars = loadAllVars()
 
-    AbstractVarSpecification(Class<T> globalsType) {
-        this.globals = Spy(globalsType)
-        this.vars = loadAllVars();
-    }
+    abstract Class<T> getGlobalsType()
 
     private Binding loadAllVars() {
         Binding vars = new Binding()

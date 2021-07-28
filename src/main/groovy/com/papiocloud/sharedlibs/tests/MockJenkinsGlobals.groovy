@@ -5,7 +5,8 @@ package com.papiocloud.sharedlibs.tests
  *
  * Var specs can use this for expectations.  Var tests can also extend this class and add
  * more methods to it depending on the plugins they are using.  When doing so, extend
- * AbstractVarSpecification<YourMockJenkinsGlobals> instead of BaseVarSpecification
+ * AbstractVarSpecification<YourMockJenkinsGlobals> instead of BaseVarSpecification and declare the type
+ * using: final Class<YourMockJenkinsGlobals> globalsType = YourMockJenkinsGlobals.class
  */
 class MockJenkinsGlobals {
 

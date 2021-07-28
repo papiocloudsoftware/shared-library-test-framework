@@ -1,6 +1,8 @@
 
 plugins {
     id "groovy"
+    id "maven-publish"
+    id "signing"
 }
 
 repositories {
@@ -22,3 +24,79 @@ dependencies {
     implementation "cglib:cglib-nodep:3.3.0"
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+String publishUser = project.findProperty("publishUser")
+String publishPassword = project.findProperty("publishPassword")
+
+publishing {
+    repositories {
+        maven {
+            name = "test"
+            url = layout.buildDirectory.dir("local-repo")
+        }
+        maven {
+            name = "snapshots"
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username publishUser
+                password publishPassword
+            }
+        }
+        maven {
+            name = "releases"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username publishUser
+                password publishPassword
+            }
+        }
+    }
+    publications {
+        lib(MavenPublication) {
+            from components.java
+            pom {
+                name = "Jenkins Shared Library Test Framework"
+                packaging = "jar"
+                description = "Spock test framework for unit testing Jenkins Shared Libraries"
+                url = "https://github.com/papiocloudsoftware/shared-library-test-framework"
+
+                scm {
+                    url = "https://github.com/papiocloudsoftware/shared-library-test-framework"
+                    connection = "scm:git:https://github.com/papiocloudsoftware/shared-library-test-framework.git"
+                    developerConnection = "scm:git:https://github.com/papiocloudsoftware/shared-library-test-framework.git"
+                }
+
+                licenses {
+                    license {
+                        name = "MIT License"
+                        url = "http://www.opensource.org/licenses/mit-license.php"
+                        distribution = "repo"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "mschenke"
+                        name = "Max Schenkelberg"
+                        email = "max@papiocloud.com"
+                    }
+                }
+            }
+        }
+    }
+}
+
+def signingKeyFile = findProperty("signing.keyfile")
+def signingKey = signingKeyFile ? file(signingKeyFile).text : null
+def signingPassword = findProperty("signing.passphrase")
+
+if (signingKey != null && signingPassword != null) {
+    signing {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.lib
+    }
+}
