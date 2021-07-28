@@ -14,10 +14,10 @@ import spock.lang.Specification
  */
 abstract class AbstractVarSpecification<T extends MockJenkinsGlobals> extends Specification {
 
-    final T globals = Spy(this.globalsType)
+    final T globals = Spy(this.globalsType())
     final Binding vars = loadAllVars()
 
-    abstract Class<T> getGlobalsType()
+    abstract Class<T> globalsType()
 
     private Binding loadAllVars() {
         Binding vars = new Binding()

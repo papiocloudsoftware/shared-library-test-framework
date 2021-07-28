@@ -6,6 +6,9 @@ package com.papiocloud.sharedlibs.tests
  */
 abstract class BaseVarSpecification extends AbstractVarSpecification<MockJenkinsGlobals> {
 
-    final Class<MockJenkinsGlobals> globalsType = MockJenkinsGlobals
+    @Override
+    final Class<MockJenkinsGlobals> globalsType() {
+        return MockJenkinsGlobals
+    }
 
 }
