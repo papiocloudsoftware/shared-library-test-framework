@@ -28,7 +28,7 @@ pipeline {
       // https://www.jenkins.io/doc/book/pipeline/syntax/#when
       when {
         beforeInput true
-        when { branch releaseBranch() }
+        branch releaseBranch()
         not { changeRequest() }
       }
       // https://www.jenkins.io/doc/book/pipeline/syntax/#input
