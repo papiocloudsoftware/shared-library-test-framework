@@ -33,8 +33,8 @@ java {
     withSourcesJar()
 }
 
-String publishUser = project.findProperty("publishUser")
-String publishPassword = project.findProperty("publishPassword")
+String publishUser = project.findProperty("publish.user")
+String publishPassword = project.findProperty("publish.password")
 
 publishing {
     repositories {
@@ -96,7 +96,7 @@ publishing {
 
 def signingKeyFile = findProperty("signing.keyfile")
 def signingKey = signingKeyFile ? file(signingKeyFile).text : null
-def signingPassword = findProperty("signing.passphrase")
+def signingPassword = findProperty("signing.password")
 
 if (signingKey != null && signingPassword != null) {
     signing {
@@ -108,6 +108,15 @@ if (signingKey != null && signingPassword != null) {
 task setReleaseVersion {
     doFirst {
         project.version = project.version - "-SNAPSHOT"
+        def props = new Properties()
+        def gradleProps = file("gradle.properties")
+        gradleProps.withInputStream {
+            props.load(it)
+        }
+        props.version = project.version
+        gradleProps.withOutputStream {
+            props.store(it, null)
+        }
     }
 }
 
@@ -134,8 +143,4 @@ task publishSnapshot {
 
 task publishRelease {
     dependsOn tasks.publishLibPublicationToReleasesRepository
-    finalizedBy tasks.updateSnapshotVersion
 }
-
-tasks.publishLibPublicationToReleasesRepository.dependsOn tasks.setReleaseVersion
-tasks.assemble.mustRunAfter tasks.setReleaseVersion
