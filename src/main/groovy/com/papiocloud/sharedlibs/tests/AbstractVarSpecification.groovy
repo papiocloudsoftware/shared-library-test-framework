@@ -33,7 +33,7 @@ abstract class AbstractVarSpecification<T extends MockJenkinsGlobals> extends Sp
         return vars
     }
 
-    def <T> T loadVar(Class<T> type) {
+    def <VarType> VarType loadVar(Class<VarType> type) {
         // Convert the var class name to script name
         String scriptName = "/${type.simpleName.uncapitalize()}.groovy"
         Script script = loadVar(this.class.getResource(scriptName).text)
