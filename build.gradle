@@ -104,3 +104,38 @@ if (signingKey != null && signingPassword != null) {
         sign publishing.publications.lib
     }
 }
+
+task setReleaseVersion {
+    doFirst {
+        project.version = project.version - "-SNAPSHOT"
+    }
+}
+
+task updateSnapshotVersion {
+    dependsOn tasks.setReleaseVersion
+    doFirst {
+        def props = new Properties()
+        def gradleProps = file("gradle.properties")
+        gradleProps.withInputStream {
+            props.load(it)
+        }
+        String[] versionParts = project.version.split("[.]")
+        versionParts[versionParts.length - 1] = (Integer.parseInt(versionParts[versionParts.length - 1]) + 1) + "-SNAPSHOT"
+        props.version = versionParts.join(".")
+        gradleProps.withOutputStream {
+            props.store(it, null)
+        }
+    }
+}
+
+task publishSnapshot {
+    dependsOn tasks.publishLibPublicationToSnapshotsRepository
+}
+
+task publishRelease {
+    dependsOn tasks.publishLibPublicationToReleasesRepository
+    finalizedBy tasks.updateSnapshotVersion
+}
+
+tasks.publishLibPublicationToReleasesRepository.dependsOn tasks.setReleaseVersion
+tasks.assemble.mustRunAfter tasks.setReleaseVersion
