@@ -42,14 +42,7 @@ pipeline {
         stage("Publish Release") {
           agent any
           steps {
-            // Logic to setup credentials and publish encapsulated in deployment-library
-            script {
-                releaseVersion = "v${readProperties(file: 'gradle.properties').version}-SNAPSHOT"
-            }
             publishMavenRelease()
-            sh "git tag -a ${releaseVersion} -m 'Version ${releaseVersion}'"
-            sh "git add -A && git commit -m 'release ${releaseVersion}'"
-            gitPush(followTags: true)
           }
         }
       }
