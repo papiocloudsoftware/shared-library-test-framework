@@ -35,6 +35,7 @@ java {
 
 String publishUser = project.findProperty("publish.user")
 String publishPassword = project.findProperty("publish.password")
+String publishUrl = project.findProperty("publish.url")
 
 publishing {
     repositories {
@@ -43,16 +44,8 @@ publishing {
             url = layout.buildDirectory.dir("local-repo")
         }
         maven {
-            name = "snapshots"
-            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            credentials {
-                username publishUser
-                password publishPassword
-            }
-        }
-        maven {
-            name = "releases"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            name = "remote"
+            url = publishUrl
             credentials {
                 username publishUser
                 password publishPassword
@@ -137,10 +130,7 @@ task updateSnapshotVersion {
     }
 }
 
-task publishSnapshot {
-    dependsOn tasks.publishLibPublicationToSnapshotsRepository
+task publishToRemote {
+    dependsOn tasks.publishLibPublicationToRemoteRepository
 }
 
-task publishRelease {
-    dependsOn tasks.publishLibPublicationToReleasesRepository
-}
